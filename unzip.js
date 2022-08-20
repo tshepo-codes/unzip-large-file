@@ -11,7 +11,6 @@ exports.handler = async (event) => {
     try {
 
         for (const record of event.Records) {
-            console.log('Event', JSON.stringify(event, null, 2));
 
             const bucket = record.s3.bucket.name;
 
