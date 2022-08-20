@@ -16,4 +16,6 @@ To get started, you can run the following commands from the root directory:
 
 This will install the dependencies for the project and deploy the project to AWS.
 
-> To remove the project you can run: npm run remove --stage dev
+> To remove the project you can run the following command:
+
+`npm run remove --stage dev`
