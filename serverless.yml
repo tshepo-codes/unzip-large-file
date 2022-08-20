@@ -1,0 +1,57 @@
+service: unzip-large-file
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'eu-west-1'}
+
+iamRoleStatements:
+  - Effect: Allow
+    Action:
+      - s3:GetObject
+      - s3:PutObject
+      - s3:ListBucket
+    Resource:
+      - "arn:aws:s3:::${self:custom.filesBucket}"
+      - "arn:aws:s3:::${self:custom.filesBucket}/*"
+
+# you can define service wide environment variables here
+#  environment:
+#    variable1: value1
+
+# you can add packaging information here
+#package:
+#  patterns:
+#    - '!exclude-me.js'
+#    - '!exclude-me-dir/**'
+#    - include-me.js
+#    - include-me-dir/**
+
+custom:
+  filesBucket: app-files-${self:provider.stage}
+
+functions:
+  hello:
+    handler: unzip.handler
+#    events:
+#      - httpApi:
+#          path: /users/create
+#          method: get
+#    Define function environment variables here
+#    environment:
+#      variable2: value2
+
+resources:
+  Resources:
+    # File bucket to hold large payloads that cannot be sent through sqs
+    FileBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.filesBucket}
+#  Outputs:
+#     NewOutput:
+#       Description: "Description for the output"
+#       Value: "Some output value"

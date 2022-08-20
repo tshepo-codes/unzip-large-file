@@ -1,0 +1,23 @@
+{
+  "name": "unzip-large-file",
+  "version": "1.0.0",
+  "description": "Unzip a large file using lambda and NodeJS runtime",
+  "main": "unzip.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tshepo325/unzip-large-file.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tshepo325/unzip-large-file/issues"
+  },
+  "homepage": "https://github.com/tshepo325/unzip-large-file#readme",
+  "dependencies": {
+    "unzipper": "^0.10.11"
+  }
+}
