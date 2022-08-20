@@ -8,50 +8,36 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'eu-west-1'}
 
-iamRoleStatements:
-  - Effect: Allow
-    Action:
-      - s3:GetObject
-      - s3:PutObject
-      - s3:ListBucket
-    Resource:
-      - "arn:aws:s3:::${self:custom.filesBucket}"
-      - "arn:aws:s3:::${self:custom.filesBucket}/*"
-
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
-
-# you can add packaging information here
-#package:
-#  patterns:
-#    - '!exclude-me.js'
-#    - '!exclude-me-dir/**'
-#    - include-me.js
-#    - include-me-dir/**
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:GetObject
+        - s3:PutObject
+        - s3:ListBucket
+      Resource:
+        - "arn:aws:s3:::${self:custom.filesBucket}"
+        - "arn:aws:s3:::${self:custom.filesBucket}/*"
 
 custom:
-  filesBucket: app-files-${self:provider.stage}
+  filesBucket: ${self:service}-${self:provider.stage}
 
 functions:
-  hello:
+  unzipFile:
     handler: unzip.handler
-#    events:
-#      - httpApi:
-#          path: /users/create
-#          method: get
-#    Define function environment variables here
-#    environment:
-#      variable2: value2
+    events:
+      - s3:
+          bucket: ${self:custom.filesBucket}
+          event: s3:ObjectCreated:*
+          existing: true
+          rules:
+            - prefix: zipped/
+            - suffix: .zip
+    environment:
+      FILE_BUCKET_NAME: ${self:custom.filesBucket}
 
 resources:
   Resources:
-    # File bucket to hold large payloads that cannot be sent through sqs
     FileBucket:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:custom.filesBucket}
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"

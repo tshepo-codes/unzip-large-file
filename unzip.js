@@ -10,37 +10,40 @@ exports.handler = async (event) => {
 
     try {
 
-        //TODO Declare and initialize your varialbles here 
-        const bucket = '';
+        for (const record of event.Records) {
+            console.log('Event', JSON.stringify(event, null, 2));
 
-        const zippedFileKey = '';
+            const bucket = record.s3.bucket.name;
 
-        //Get the file stream using the unzipper plugin
-        const zippedFileStream = s3
-            .getObject({ Bucket: bucket, Key: zippedFileKey })
-            .createReadStream()
-            .on("error", (error) => console.log(`Error extracting file: `, JSON.stringify(error, null, 2)))
-            .pipe(unzipper.Parse({ forceStream: true }));
+            const zippedFileKey = record.s3.object.key;
 
-        // Loop through each entry of the file stream
-        for await (const streamEntry of zippedFileStream) {
+            //Get the file stream using the unzipper plugin
+            const zippedFileStream = s3
+                .getObject({ Bucket: bucket, Key: zippedFileKey })
+                .createReadStream()
+                .on("error", (error) => console.log(`Error extracting file: `, JSON.stringify(error, null, 2)))
+                .pipe(unzipper.Parse({ forceStream: true }));
 
-            const fileKey = streamEntry.path;
+            // Loop through each entry of the file stream
+            for await (const streamEntry of zippedFileStream) {
 
-            // 'Directory' or 'File'
-            const type = streamEntry.type;
+                const fileKey = 'unzipped/' + streamEntry.path;
 
-            if (type === "File") {
+                // 'Directory' or 'File'
+                const type = streamEntry.type;
 
-                // Write the unzipped streamEntry back to S3
-                await s3.putObject(
-                    { Bucket: bucket, Key: fileKey, Body: streamEntry })
-                    .promise();
+                if (type === "File") {
 
-            } else {
+                    // Write the unzipped streamEntry back to S3
+                    await s3.putObject(
+                        { Bucket: bucket, Key: fileKey, Body: streamEntry })
+                        .promise();
 
-                streamEntry.autodrain();
+                } else {
 
+                    streamEntry.autodrain();
+
+                }
             }
         }
 
