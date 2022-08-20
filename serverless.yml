@@ -30,10 +30,8 @@ functions:
           event: s3:ObjectCreated:*
           existing: true
           rules:
-            - prefix: zipped/
+            # - prefix: zipped/ #TODO uncomment this if you want to unzip files in specific folder
             - suffix: .zip
-    environment:
-      FILE_BUCKET_NAME: ${self:custom.filesBucket}
 
 resources:
   Resources:
